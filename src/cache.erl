@@ -7,7 +7,7 @@
 	start/0,
 	set/2, set/3,
 	get/1,
-	incr/1, incr/2,
+	incr/1, incr/2, incr/3
 	del/1
 ]).
 
@@ -48,6 +48,22 @@ incr(Key, Offset) ->
 	catch
 		error:badarg ->
 			ets:insert(?DEFAULT_DATA_TABLE, {Key, Offset, undefined}),
+			Offset
+	end.
+
+-spec incr(Key :: any(), Offset :: integer(), Expiration :: integer()) -> integer() | undefined.
+incr(Key, Offset, Expiration) ->
+	ExpireAfter = case Expiration of
+		undefined -> undefined;
+		Expiration when is_integer(Expiration) ->
+			ets_cache_util:timestamp() + Expiration;
+		_ -> undefined
+	end,
+	try
+		ets:update_counter(?DEFAULT_DATA_TABLE, Key, Offset)
+	catch
+		error:badarg ->
+			ets:insert(?DEFAULT_DATA_TABLE, {Key, Offset, ExpireAfter}),
 			Offset
 	end.
 
