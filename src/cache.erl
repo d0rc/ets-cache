@@ -7,7 +7,7 @@
 	start/0,
 	set/2, set/3,
 	get/1,
-	incr/1, incr/2, incr/3
+	incr/1, incr/2, incr/3,
 	del/1
 ]).
 
